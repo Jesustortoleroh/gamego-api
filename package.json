@@ -1,0 +1,21 @@
+{
+  "name": "gamego-api",
+  "version": "1.0.0",
+  "description": "- Jesus Tortolero (GitHub Management, Validation)\r - Casey Owens (MongoDB, Render)\r - Zach Jones (Endpoints, OAuth)\r - Nnanna Uko (Error Handling, Testing)",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "nodemon server.js",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Jesustortoleroh/gamego-api.git"
+  },
+  "keywords": [],
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/Jesustortoleroh/gamego-api/issues"
+  },
+  "homepage": "https://github.com/Jesustortoleroh/gamego-api#readme"
+}
