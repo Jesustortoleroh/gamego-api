@@ -1,0 +1,267 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "GameGo API",
+    "description": "The API for GameGo, an online store that sells new and retro video games, consoles and video game accessories. It keeps track of the store's warehouses, inventory, customers and employees.",
+    "version": "1.0.0"
+  },
+  "basePath": "/",
+  "tags": [
+    {
+      "name": "Employees",
+      "description": "The people who work at the warehouses"
+    }
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/employees/": {
+      "get": {
+        "tags": [
+          "Employees"
+        ],
+        "summary": "Get all employees",
+        "description": "",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Employee"
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Employees"
+        ],
+        "summary": "Create an employee",
+        "description": "",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Employee"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created",
+            "schema": {
+              "$ref": "#/definitions/EmployeeId"
+            }
+          },
+          "400": {
+            "description": "Invalid warehouse_assigned id",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/employees/{id}": {
+      "get": {
+        "tags": [
+          "Employees"
+        ],
+        "summary": "Get an employee by id",
+        "description": "",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/Employee"
+            }
+          },
+          "400": {
+            "description": "Invalid id",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "404": {
+            "description": "Employee not found",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Employees"
+        ],
+        "summary": "Update an employee",
+        "description": "",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Employee"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Updated"
+          },
+          "400": {
+            "description": "Invalid id or warehouse_assigned id",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "404": {
+            "description": "Employee not found",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Employees"
+        ],
+        "summary": "Delete an employee",
+        "description": "",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Deleted",
+            "schema": {
+              "$ref": "#/definitions/Employee"
+            }
+          },
+          "400": {
+            "description": "Invalid id",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "404": {
+            "description": "Employee not found",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "Employee": {
+      "type": "object",
+      "required": [
+        "job_title",
+        "first_name",
+        "last_name",
+        "warehouse_assigned",
+        "wage",
+        "wage_type",
+        "active"
+      ],
+      "properties": {
+        "_id": {
+          "type": "string",
+          "readOnly": true,
+          "example": "6af5eb6a63f99c7e6388b832"
+        },
+        "job_title": {
+          "type": "string",
+          "enum": [
+            "Warehouse Worker",
+            "Warehouse Manager"
+          ],
+          "example": "Warehouse Worker"
+        },
+        "first_name": {
+          "type": "string",
+          "example": "Ada"
+        },
+        "last_name": {
+          "type": "string",
+          "example": "Obi"
+        },
+        "warehouse_assigned": {
+          "type": "string",
+          "description": "The _id of the warehouse the employee works at",
+          "example": "6af5eaea63f99c7e6388b82c"
+        },
+        "wage": {
+          "type": "number",
+          "description": "Per hour when wage_type is Hourly, per year when it is Salary",
+          "example": 18.5
+        },
+        "wage_type": {
+          "type": "string",
+          "enum": [
+            "Hourly",
+            "Salary"
+          ],
+          "example": "Hourly"
+        },
+        "active": {
+          "type": "boolean",
+          "description": "false if the employee no longer works at GameGo",
+          "example": true
+        }
+      }
+    },
+    "EmployeeId": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "example": "6af5eb6a63f99c7e6388b832"
+        }
+      }
+    },
+    "Error": {
+      "type": "object",
+      "properties": {
+        "message": {
+          "type": "string",
+          "example": "No employee found with id 6af5eb6a63f99c7e6388b832"
+        }
+      }
+    }
+  }
+}
