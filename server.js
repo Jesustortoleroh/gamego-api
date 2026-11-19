@@ -1,32 +1,48 @@
-import dotenv from 'dotenv';
-import express from 'express';
+import 'dotenv/config';
+import { MongoClient } from 'mongodb';
+import { createApp } from './app.js';
 
-import { initDb } from './db/connect.js';
-import routes from './routes/index.js';
+async function start() {
+  const { MONGODB_URI, MONGODB_DB_NAME = 'GameGO', PORT = 3000 } = process.env;
+  if (!MONGODB_URI) {
+    console.error('Set MONGODB_URI before starting GameGo.');
+    process.exitCode = 1;
+    return;
+  }
 
-dotenv.config({ quiet: true });
+  const client = new MongoClient(MONGODB_URI, { serverSelectionTimeoutMS: 10000 });
+  try {
+    await client.connect();
+    
+    // Connect to the database and get both collections
+    const db = client.db(MONGODB_DB_NAME);
+    const warehouses = db.collection('warehouses');
+    const items = db.collection('items'); 
+    
+    // Pass both collections to createApp
+    const server = createApp(warehouses, items).listen(PORT, () => {
+      console.log(`Server running on port ${PORT}`);
+    });
 
-const app = express();
-const PORT = process.env.PORT || 3000;
+    server.on('error', async () => {
+      console.error('GameGo could not listen on the configured port.');
+      process.exitCode = 1;
+      await client.close();
+    });
 
-app.use(express.json());
+    // Graceful shutdown handling
+    for (const signal of ['SIGINT', 'SIGTERM']) {
+      process.once(signal, () => {
+        server.close(() => client.close());
+      });
+    }
+  } catch (error) {
+    await client.close();
+    throw error;
+  }
+}
 
-app.get('/', (req, res) => {
-  res.status(200).json({ message: 'GameGo API is running!' });
-});
-
-app.use('/', routes);
-
-const start = async () => {
-  const db = await initDb();
-  console.log(`Connected to MongoDB database "${db.databaseName}"`);
-
-  app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
-  });
-};
-
-start().catch((err) => {
-  console.error('Failed to start server:', err.message);
-  process.exit(1);
+start().catch(() => {
+  console.error('GameGo could not connect to MongoDB. Check the connection settings.');
+  process.exitCode = 1;
 });

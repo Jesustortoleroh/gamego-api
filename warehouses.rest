@@ -1,0 +1,46 @@
+@baseUrl = http://localhost:3000
+
+### List warehouses (200)
+GET {{baseUrl}}/warehouses
+
+### Create a sample warehouse (201)
+# @name createWarehouse
+POST {{baseUrl}}/warehouses
+Content-Type: application/json
+
+{
+  "name": "Boise warehouse",
+  "address": "100 Main St",
+  "employees": []
+}
+
+### Read the sample warehouse (200)
+GET {{baseUrl}}/warehouses/by-id?id={{createWarehouse.response.body.$.id}}
+
+### Update the sample warehouse (204)
+PUT {{baseUrl}}/warehouses/{{createWarehouse.response.body.$.id}}
+Content-Type: application/json
+
+{
+  "name": "Boise distribution center",
+  "address": "200 Main St",
+  "employees": []
+}
+
+### Reject invalid warehouse data (400)
+POST {{baseUrl}}/warehouses
+Content-Type: application/json
+
+{
+  "name": "",
+  "employees": "invalid"
+}
+
+### Reject an invalid ID (400)
+GET {{baseUrl}}/warehouses/by-id?id=invalid
+
+### Delete the sample warehouse (200)
+DELETE {{baseUrl}}/warehouses/{{createWarehouse.response.body.$.id}}
+
+### Look up the deleted warehouse (404)
+GET {{baseUrl}}/warehouses/by-id?id={{createWarehouse.response.body.$.id}}
