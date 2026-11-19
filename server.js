@@ -14,13 +14,14 @@ async function start() {
   try {
     await client.connect();
     
-    // Connect to the database and get both collections
+    // Connect to the database and get the collections
     const db = client.db(MONGODB_DB_NAME);
     const warehouses = db.collection('warehouses');
-    const items = db.collection('items'); 
-    
-    // Pass both collections to createApp
-    const server = createApp(warehouses, items).listen(PORT, () => {
+    const items = db.collection('items');
+    const employees = db.collection('employee');
+
+    // Pass the collections to createApp
+    const server = createApp(warehouses, items, employees).listen(PORT, () => {
       console.log(`Server running on port ${PORT}`);
     });
 
