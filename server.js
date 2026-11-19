@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import { MongoClient } from 'mongodb';
 import { createApp } from './app.js';
 
@@ -12,8 +13,14 @@ async function start() {
   const client = new MongoClient(MONGODB_URI, { serverSelectionTimeoutMS: 10000 });
   try {
     await client.connect();
-    const warehouses = client.db(MONGODB_DB_NAME).collection('warehouses');
-    const server = createApp(warehouses).listen(PORT, () => {
+    
+    // Connect to the database and get both collections
+    const db = client.db(MONGODB_DB_NAME);
+    const warehouses = db.collection('warehouses');
+    const items = db.collection('items'); 
+    
+    // Pass both collections to createApp
+    const server = createApp(warehouses, items).listen(PORT, () => {
       console.log(`Server running on port ${PORT}`);
     });
 
@@ -23,6 +30,7 @@ async function start() {
       await client.close();
     });
 
+    // Graceful shutdown handling
     for (const signal of ['SIGINT', 'SIGTERM']) {
       process.once(signal, () => {
         server.close(() => client.close());

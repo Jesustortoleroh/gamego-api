@@ -1,7 +1,7 @@
 import express from 'express';
 import {
   create, getAll, getSingle, remove, update, validateWarehouse, validateWarehouseId,
-} from '../controller/warehouse.js';
+} from '../controllers/warehouse.js';
 
 const router = express.Router();
 

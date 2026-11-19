@@ -1,0 +1,47 @@
+@baseUrl = http://localhost:3000
+
+### List items (200)
+GET {{baseUrl}}/items
+
+### Create a sample item (201)
+# @name createItem
+POST {{baseUrl}}/items
+Content-Type: application/json
+
+{
+  "name": "Super Mario Bros.",
+  "price": 59.99,
+  "inStock": 10
+}
+
+### Read the sample item (200)
+GET {{baseUrl}}/items/by-id?id={{createItem.response.body.$.id}}
+
+### Update the sample item (204)
+PUT {{baseUrl}}/items/{{createItem.response.body.$.id}}
+Content-Type: application/json
+
+{
+  "name": "Super Mario Bros. Wonder",
+  "price": 49.99,
+  "inStock": 8
+}
+
+### Reject invalid item data (400)
+POST {{baseUrl}}/items
+Content-Type: application/json
+
+{
+  "name": "",
+  "price": -1,
+  "inStock": 1.5
+}
+
+### Reject an invalid ID (400)
+GET {{baseUrl}}/items/by-id?id=invalid
+
+### Delete the sample item (200)
+DELETE {{baseUrl}}/items/{{createItem.response.body.$.id}}
+
+### Look up the deleted item (404)
+GET {{baseUrl}}/items/by-id?id={{createItem.response.body.$.id}}
