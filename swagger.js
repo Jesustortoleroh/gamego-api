@@ -10,8 +10,38 @@ const doc = {
   schemes: null,
   consumes: ['application/json'],
   produces: ['application/json'],
-  tags: [{ name: 'Employees', description: 'The people who work at the warehouses' }],
+  tags: [
+    { name: 'Items', description: 'The video games, consoles and accessories GameGo sells' },
+    { name: 'Warehouses', description: 'The warehouses that store the inventory' },
+    { name: 'Employees', description: 'The people who work at the warehouses' },
+    { name: 'OAuth', description: 'Log in with GitHub (planned, not built yet)' },
+  ],
   '@definitions': {
+    Item: {
+      type: 'object',
+      required: ['name', 'price', 'inStock'],
+      properties: {
+        _id: { type: 'string', readOnly: true, example: '6af5ea6063f99c7e6388b827' },
+        name: { type: 'string', example: 'Super Mario Bros.' },
+        price: { type: 'number', example: 59.99 },
+        inStock: { type: 'integer', description: 'How many are in stock', example: 10 },
+      },
+    },
+    Warehouse: {
+      type: 'object',
+      required: ['name', 'address', 'employees'],
+      properties: {
+        _id: { type: 'string', readOnly: true, example: '6af5eaea63f99c7e6388b82c' },
+        name: { type: 'string', example: 'Boise warehouse' },
+        address: { type: 'string', example: '100 Main St, Boise, ID 83702' },
+        employees: {
+          type: 'array',
+          description: 'The _ids of the employees who work here',
+          items: { type: 'string' },
+          example: ['6af5eb6a63f99c7e6388b832'],
+        },
+      },
+    },
     Employee: {
       type: 'object',
       required: [
@@ -48,18 +78,6 @@ const doc = {
           description: 'false if the employee no longer works at GameGo',
           example: true,
         },
-      },
-    },
-    EmployeeId: {
-      type: 'object',
-      properties: {
-        id: { type: 'string', example: '6af5eb6a63f99c7e6388b832' },
-      },
-    },
-    Error: {
-      type: 'object',
-      properties: {
-        message: { type: 'string', example: 'No employee found with id 6af5eb6a63f99c7e6388b832' },
       },
     },
   },

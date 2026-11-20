@@ -13,19 +13,13 @@ const employeeFromBody = (body) => ({
 });
 
 export const getAll = async (req, res) => {
-  // #swagger.tags = ['Employees']
   // #swagger.summary = 'Get all employees'
-  // #swagger.responses[200] = { description: 'OK', schema: [{ $ref: '#/definitions/Employee' }] }
   const employees = await req.app.locals.employees.find().toArray();
   res.status(200).json(employees);
 };
 
 export const getSingle = async (req, res) => {
-  // #swagger.tags = ['Employees']
   // #swagger.summary = 'Get an employee by id'
-  // #swagger.responses[200] = { description: 'OK', schema: { $ref: '#/definitions/Employee' } }
-  // #swagger.responses[400] = { description: 'Invalid id', schema: { $ref: '#/definitions/Error' } }
-  // #swagger.responses[404] = { description: 'Employee not found', schema: { $ref: '#/definitions/Error' } }
   const { id } = req.params;
 
   const employee = await req.app.locals.employees.findOne({ _id: new ObjectId(id) });
@@ -35,11 +29,8 @@ export const getSingle = async (req, res) => {
 };
 
 export const createEmployee = async (req, res) => {
-  // #swagger.tags = ['Employees']
   // #swagger.summary = 'Create an employee'
   // #swagger.parameters['body'] = { in: 'body', required: true, schema: { $ref: '#/definitions/Employee' } }
-  // #swagger.responses[201] = { description: 'Created', schema: { $ref: '#/definitions/EmployeeId' } }
-  // #swagger.responses[400] = { description: 'Invalid warehouse_assigned id', schema: { $ref: '#/definitions/Error' } }
   const result = await req.app.locals.employees.insertOne(employeeFromBody(req.body));
 
   res
@@ -49,12 +40,8 @@ export const createEmployee = async (req, res) => {
 };
 
 export const updateEmployee = async (req, res) => {
-  // #swagger.tags = ['Employees']
   // #swagger.summary = 'Update an employee'
   // #swagger.parameters['body'] = { in: 'body', required: true, schema: { $ref: '#/definitions/Employee' } }
-  // #swagger.responses[204] = { description: 'Updated' }
-  // #swagger.responses[400] = { description: 'Invalid id or warehouse_assigned id', schema: { $ref: '#/definitions/Error' } }
-  // #swagger.responses[404] = { description: 'Employee not found', schema: { $ref: '#/definitions/Error' } }
   const { id } = req.params;
 
   const result = await req.app.locals.employees.replaceOne(
@@ -67,11 +54,7 @@ export const updateEmployee = async (req, res) => {
 };
 
 export const deleteEmployee = async (req, res) => {
-  // #swagger.tags = ['Employees']
   // #swagger.summary = 'Delete an employee'
-  // #swagger.responses[200] = { description: 'Deleted', schema: { $ref: '#/definitions/Employee' } }
-  // #swagger.responses[400] = { description: 'Invalid id', schema: { $ref: '#/definitions/Error' } }
-  // #swagger.responses[404] = { description: 'Employee not found', schema: { $ref: '#/definitions/Error' } }
   const { id } = req.params;
 
   const employee = await req.app.locals.employees.findOneAndDelete({ _id: new ObjectId(id) });

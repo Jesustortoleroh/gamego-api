@@ -1,11 +1,13 @@
 import { ObjectId } from 'mongodb';
 
 export async function getAll(req, res) {
+  // #swagger.summary = 'Get all warehouses'
   const warehouses = await req.app.locals.warehouses.find().toArray();
   res.status(200).json(warehouses);
 }
 
 export async function getSingle(req, res) {
+  // #swagger.summary = 'Get a warehouse by id'
   const warehouse = await req.app.locals.warehouses.findOne({ _id: res.locals.warehouseId });
   if (!warehouse) return res.status(404).json({ error: 'Warehouse not found' });
 
@@ -13,11 +15,15 @@ export async function getSingle(req, res) {
 }
 
 export async function create(req, res) {
+  // #swagger.summary = 'Create a warehouse'
+  // #swagger.parameters['body'] = { in: 'body', required: true, schema: { $ref: '#/definitions/Warehouse' } }
   const { insertedId } = await req.app.locals.warehouses.insertOne(res.locals.warehouse);
   res.location(`/warehouses/by-id?id=${insertedId}`).status(201).json({ id: insertedId });
 }
 
 export async function update(req, res) {
+  // #swagger.summary = 'Update a warehouse'
+  // #swagger.parameters['body'] = { in: 'body', required: true, schema: { $ref: '#/definitions/Warehouse' } }
   const result = await req.app.locals.warehouses.updateOne(
     { _id: res.locals.warehouseId },
     { $set: res.locals.warehouse },
@@ -28,6 +34,7 @@ export async function update(req, res) {
 }
 
 export async function remove(req, res) {
+  // #swagger.summary = 'Delete a warehouse'
   const result = await req.app.locals.warehouses.deleteOne({ _id: res.locals.warehouseId });
   if (!result.deletedCount) return res.status(404).json({ error: 'Warehouse not found' });
 

@@ -8,8 +8,20 @@
   "basePath": "/",
   "tags": [
     {
+      "name": "Items",
+      "description": "The video games, consoles and accessories GameGo sells"
+    },
+    {
+      "name": "Warehouses",
+      "description": "The warehouses that store the inventory"
+    },
+    {
       "name": "Employees",
       "description": "The people who work at the warehouses"
+    },
+    {
+      "name": "OAuth",
+      "description": "Log in with GitHub (planned, not built yet)"
     }
   ],
   "consumes": [
@@ -19,18 +31,12 @@
     "application/json"
   ],
   "paths": {
-    "/": {
-      "get": {
-        "description": "",
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
     "/warehouses/": {
       "get": {
+        "tags": [
+          "Warehouses"
+        ],
+        "summary": "Get all warehouses",
         "description": "",
         "responses": {
           "200": {
@@ -39,24 +45,18 @@
         }
       },
       "post": {
+        "tags": [
+          "Warehouses"
+        ],
+        "summary": "Create a warehouse",
         "description": "",
         "parameters": [
           {
             "name": "body",
             "in": "body",
+            "required": true,
             "schema": {
-              "type": "object",
-              "properties": {
-                "name": {
-                  "example": "any"
-                },
-                "address": {
-                  "example": "any"
-                },
-                "employees": {
-                  "example": "any"
-                }
-              }
+              "$ref": "#/definitions/Warehouse"
             }
           }
         ],
@@ -69,6 +69,10 @@
     },
     "/warehouses/by-id": {
       "get": {
+        "tags": [
+          "Warehouses"
+        ],
+        "summary": "Get a warehouse by id",
         "description": "",
         "parameters": [
           {
@@ -89,6 +93,10 @@
     },
     "/warehouses/{id}": {
       "put": {
+        "tags": [
+          "Warehouses"
+        ],
+        "summary": "Update a warehouse",
         "description": "",
         "parameters": [
           {
@@ -100,19 +108,9 @@
           {
             "name": "body",
             "in": "body",
+            "required": true,
             "schema": {
-              "type": "object",
-              "properties": {
-                "name": {
-                  "example": "any"
-                },
-                "address": {
-                  "example": "any"
-                },
-                "employees": {
-                  "example": "any"
-                }
-              }
+              "$ref": "#/definitions/Warehouse"
             }
           }
         ],
@@ -129,6 +127,10 @@
         }
       },
       "delete": {
+        "tags": [
+          "Warehouses"
+        ],
+        "summary": "Delete a warehouse",
         "description": "",
         "parameters": [
           {
@@ -150,6 +152,10 @@
     },
     "/items/": {
       "get": {
+        "tags": [
+          "Items"
+        ],
+        "summary": "Get all items",
         "description": "",
         "responses": {
           "200": {
@@ -158,24 +164,18 @@
         }
       },
       "post": {
+        "tags": [
+          "Items"
+        ],
+        "summary": "Create an item",
         "description": "",
         "parameters": [
           {
             "name": "body",
             "in": "body",
+            "required": true,
             "schema": {
-              "type": "object",
-              "properties": {
-                "name": {
-                  "example": "any"
-                },
-                "price": {
-                  "example": "any"
-                },
-                "inStock": {
-                  "example": "any"
-                }
-              }
+              "$ref": "#/definitions/Item"
             }
           }
         ],
@@ -188,6 +188,10 @@
     },
     "/items/by-id": {
       "get": {
+        "tags": [
+          "Items"
+        ],
+        "summary": "Get an item by id",
         "description": "",
         "parameters": [
           {
@@ -208,6 +212,10 @@
     },
     "/items/{id}": {
       "put": {
+        "tags": [
+          "Items"
+        ],
+        "summary": "Update an item",
         "description": "",
         "parameters": [
           {
@@ -219,19 +227,9 @@
           {
             "name": "body",
             "in": "body",
+            "required": true,
             "schema": {
-              "type": "object",
-              "properties": {
-                "name": {
-                  "example": "any"
-                },
-                "price": {
-                  "example": "any"
-                },
-                "inStock": {
-                  "example": "any"
-                }
-              }
+              "$ref": "#/definitions/Item"
             }
           }
         ],
@@ -248,6 +246,10 @@
         }
       },
       "delete": {
+        "tags": [
+          "Items"
+        ],
+        "summary": "Delete an item",
         "description": "",
         "parameters": [
           {
@@ -276,16 +278,7 @@
         "description": "",
         "responses": {
           "200": {
-            "description": "OK",
-            "schema": {
-              "type": "array",
-              "items": {
-                "$ref": "#/definitions/Employee"
-              },
-              "xml": {
-                "name": "main"
-              }
-            }
+            "description": "OK"
           }
         }
       },
@@ -307,16 +300,7 @@
         ],
         "responses": {
           "201": {
-            "description": "Created",
-            "schema": {
-              "$ref": "#/definitions/EmployeeId"
-            }
-          },
-          "400": {
-            "description": "Invalid warehouse_assigned id",
-            "schema": {
-              "$ref": "#/definitions/Error"
-            }
+            "description": "Created"
           }
         }
       }
@@ -338,22 +322,7 @@
         ],
         "responses": {
           "200": {
-            "description": "OK",
-            "schema": {
-              "$ref": "#/definitions/Employee"
-            }
-          },
-          "400": {
-            "description": "Invalid id",
-            "schema": {
-              "$ref": "#/definitions/Error"
-            }
-          },
-          "404": {
-            "description": "Employee not found",
-            "schema": {
-              "$ref": "#/definitions/Error"
-            }
+            "description": "OK"
           }
         }
       },
@@ -381,19 +350,7 @@
         ],
         "responses": {
           "204": {
-            "description": "Updated"
-          },
-          "400": {
-            "description": "Invalid id or warehouse_assigned id",
-            "schema": {
-              "$ref": "#/definitions/Error"
-            }
-          },
-          "404": {
-            "description": "Employee not found",
-            "schema": {
-              "$ref": "#/definitions/Error"
-            }
+            "description": "No Content"
           }
         }
       },
@@ -413,28 +370,130 @@
         ],
         "responses": {
           "200": {
-            "description": "Deleted",
-            "schema": {
-              "$ref": "#/definitions/Employee"
-            }
-          },
-          "400": {
-            "description": "Invalid id",
-            "schema": {
-              "$ref": "#/definitions/Error"
-            }
-          },
-          "404": {
-            "description": "Employee not found",
-            "schema": {
-              "$ref": "#/definitions/Error"
-            }
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/github": {
+      "get": {
+        "tags": [
+          "OAuth"
+        ],
+        "summary": "Log in with GitHub",
+        "description": "",
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/github/callback": {
+      "get": {
+        "tags": [
+          "OAuth"
+        ],
+        "summary": "GitHub login callback",
+        "description": "",
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/auth/me": {
+      "get": {
+        "tags": [
+          "OAuth"
+        ],
+        "summary": "Get the logged-in user",
+        "description": "",
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/auth/logout": {
+      "post": {
+        "tags": [
+          "OAuth"
+        ],
+        "summary": "Log out",
+        "description": "",
+        "responses": {
+          "default": {
+            "description": ""
           }
         }
       }
     }
   },
   "definitions": {
+    "Item": {
+      "type": "object",
+      "required": [
+        "name",
+        "price",
+        "inStock"
+      ],
+      "properties": {
+        "_id": {
+          "type": "string",
+          "readOnly": true,
+          "example": "6af5ea6063f99c7e6388b827"
+        },
+        "name": {
+          "type": "string",
+          "example": "Super Mario Bros."
+        },
+        "price": {
+          "type": "number",
+          "example": 59.99
+        },
+        "inStock": {
+          "type": "integer",
+          "description": "How many are in stock",
+          "example": 10
+        }
+      }
+    },
+    "Warehouse": {
+      "type": "object",
+      "required": [
+        "name",
+        "address",
+        "employees"
+      ],
+      "properties": {
+        "_id": {
+          "type": "string",
+          "readOnly": true,
+          "example": "6af5eaea63f99c7e6388b82c"
+        },
+        "name": {
+          "type": "string",
+          "example": "Boise warehouse"
+        },
+        "address": {
+          "type": "string",
+          "example": "100 Main St, Boise, ID 83702"
+        },
+        "employees": {
+          "type": "array",
+          "description": "The _ids of the employees who work here",
+          "items": {
+            "type": "string"
+          },
+          "example": [
+            "6af5eb6a63f99c7e6388b832"
+          ]
+        }
+      }
+    },
     "Employee": {
       "type": "object",
       "required": [
@@ -490,24 +549,6 @@
           "type": "boolean",
           "description": "false if the employee no longer works at GameGo",
           "example": true
-        }
-      }
-    },
-    "EmployeeId": {
-      "type": "object",
-      "properties": {
-        "id": {
-          "type": "string",
-          "example": "6af5eb6a63f99c7e6388b832"
-        }
-      }
-    },
-    "Error": {
-      "type": "object",
-      "properties": {
-        "message": {
-          "type": "string",
-          "example": "No employee found with id 6af5eb6a63f99c7e6388b832"
         }
       }
     }

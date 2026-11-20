@@ -4,6 +4,7 @@ import { ObjectId } from 'mongodb';
  * Retrieves all items from the database.
  */
 export async function getAll(req, res, next) {
+  // #swagger.summary = 'Get all items'
   try {
     const items = await req.app.locals.items.find().toArray();
     res.status(200).json(items);
@@ -17,6 +18,7 @@ export async function getAll(req, res, next) {
  * The ID is expected to be in res.locals.itemId, validated by the middleware.
  */
 export async function getSingle(req, res, next) {
+  // #swagger.summary = 'Get an item by id'
   try {
     const item = await req.app.locals.items.findOne({ _id: res.locals.itemId });
     if (!item) return res.status(404).json({ error: 'Item not found' });
@@ -31,6 +33,8 @@ export async function getSingle(req, res, next) {
  * The data is expected to be in res.locals.item, validated by the middleware.
  */
 export async function create(req, res, next) {
+  // #swagger.summary = 'Create an item'
+  // #swagger.parameters['body'] = { in: 'body', required: true, schema: { $ref: '#/definitions/Item' } }
   try {
     const { insertedId } = await req.app.locals.items.insertOne(res.locals.item);
     res.location(`/items/by-id?id=${insertedId}`).status(201).json({ id: insertedId });
@@ -44,6 +48,8 @@ export async function create(req, res, next) {
  * Uses $set to only update the provided fields.
  */
 export async function update(req, res, next) {
+  // #swagger.summary = 'Update an item'
+  // #swagger.parameters['body'] = { in: 'body', required: true, schema: { $ref: '#/definitions/Item' } }
   try {
     const result = await req.app.locals.items.updateOne(
       { _id: res.locals.itemId },
@@ -60,6 +66,7 @@ export async function update(req, res, next) {
  * Deletes an item by its ID.
  */
 export async function remove(req, res, next) {
+  // #swagger.summary = 'Delete an item'
   try {
     const result = await req.app.locals.items.deleteOne({ _id: res.locals.itemId });
     if (!result.deletedCount) return res.status(404).json({ error: 'Item not found' });
