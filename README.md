@@ -8,7 +8,7 @@
 
 ## Warehouse API
 
-Use Node.js 20.19 or later and set `MONGODB_URI` to your MongoDB connection string in the terminal. Set `MONGODB_DB_NAME` if your database name differs from `GameGO`. Warehouse records are stored in the `warehouses` collection.
+Use Node.js 20.19 or later and set `MONGODB_URI` to your MongoDB connection string in the terminal. Set `MONGODB_DB_NAME` if your database name differs from `GameGo`. Warehouse records are stored in the `warehouse` collection.
 
 ```sh
 npm ci
