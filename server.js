@@ -3,7 +3,7 @@ import { MongoClient } from 'mongodb';
 import { createApp } from './app.js';
 
 async function start() {
-  const { MONGODB_URI, MONGODB_DB_NAME = 'GameGO', PORT = 3000 } = process.env;
+  const { MONGODB_URI, MONGODB_DB_NAME = 'GameGo', PORT = 3000 } = process.env;
   if (!MONGODB_URI) {
     console.error('Set MONGODB_URI before starting GameGo.');
     process.exitCode = 1;
@@ -14,13 +14,14 @@ async function start() {
   try {
     await client.connect();
     
-    // Connect to the database and get both collections
+    // Connect to the database and get the collections
     const db = client.db(MONGODB_DB_NAME);
-    const warehouses = db.collection('warehouses');
-    const items = db.collection('items'); 
-    
-    // Pass both collections to createApp
-    const server = createApp(warehouses, items).listen(PORT, () => {
+    const warehouses = db.collection('warehouse');
+    const items = db.collection('item');
+    const employees = db.collection('employee');
+
+    // Pass the collections to createApp
+    const server = createApp(warehouses, items, employees).listen(PORT, () => {
       console.log(`Server running on port ${PORT}`);
     });
 

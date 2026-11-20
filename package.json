@@ -7,12 +7,17 @@
   "scripts": {
     "dev": "node --watch server.js",
     "start": "node server.js",
-    "test": "node --test"
+    "test": "node --test",
+    "swagger": "node swagger.js"
   },
   "dependencies": {
     "dotenv": "^18.0.10",
     "express": "^5.1.0",
-    "mongodb": "^7.9.0"
+    "mongodb": "^7.9.0",
+    "swagger-ui-express": "^5.0.1"
+  },
+  "devDependencies": {
+    "swagger-autogen": "^2.23.7"
   },
   "engines": {
     "node": ">=20.19.0"
