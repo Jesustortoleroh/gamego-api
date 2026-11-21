@@ -13,7 +13,6 @@ export function createApp(warehouses, items, employees, customers) {
   app.locals.employees = employees;
   app.locals.customers = customers;
 
-  app.use(express.json())
   app.use('/warehouses', /* #swagger.tags = ['Warehouses'] */ warehouseRoutes);
   app.use('/items', /* #swagger.tags = ['Items'] */ itemRoutes);
   app.use('/employees', /* #swagger.tags = ['Employees'] */ employeeRoutes);
