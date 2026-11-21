@@ -94,26 +94,25 @@ const doc = {
       ],
       properties: {
         _id: { type: 'string', readOnly: true, example: '6af5eb6a63f99c7e6388b833' },
-        first_name: { type: 'string', example: 'Ada' },
-        last_name: { type: 'string', example: 'Obi' },
+        first_name: { type: 'string', example: 'Bob' },
+        last_name: { type: 'string', example: 'Jones' },
         email: {
           type: 'string',
           format: 'email',
-          example: 'ada.obi@example.com',
+          example: 'bob@email.com',
         },
         address: {
           type: 'string',
           description: 'The shipping and billing address of the customer',
-          example: '742 Evergreen Terrace, Springfield, IL 62704',
+          example: '123 ABC Street, New York, NY, 12345',
         },
         phone_number: {
           type: 'string',
-          example: '555-019-2834',
+          example: '(123) 456-7890',
         },
         favorite_console: {
           type: 'string',
-          enum: ['PlayStation 5', 'Xbox Series X', 'Nintendo Switch', 'PC'],
-          example: 'PlayStation 5',
+          example: 'GameCube',
         },
         shopping_cart: {
           type: 'array',
