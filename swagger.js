@@ -14,6 +14,7 @@ const doc = {
     { name: 'Items', description: 'The video games, consoles and accessories GameGo sells' },
     { name: 'Warehouses', description: 'The warehouses that store the inventory' },
     { name: 'Employees', description: 'The people who work at the warehouses' },
+    { name: 'Customers', description: 'The people who purchase the products' },
     { name: 'OAuth', description: 'Log in with GitHub (planned, not built yet)' },
   ],
   '@definitions': {
@@ -77,6 +78,49 @@ const doc = {
           type: 'boolean',
           description: 'false if the employee no longer works at GameGo',
           example: true,
+        },
+      },
+    },
+    Customer: {
+      type: 'object',
+      required: [
+        'first_name',
+        'last_name',
+        'email',
+        'address',
+        'phone_number',
+        'favorite_console',
+        'shopping_cart',
+      ],
+      properties: {
+        _id: { type: 'string', readOnly: true, example: '6af5eb6a63f99c7e6388b833' },
+        first_name: { type: 'string', example: 'Bob' },
+        last_name: { type: 'string', example: 'Jones' },
+        email: {
+          type: 'string',
+          format: 'email',
+          example: 'bob@email.com',
+        },
+        address: {
+          type: 'string',
+          description: 'The shipping and billing address of the customer',
+          example: '123 ABC Street, New York, NY, 12345',
+        },
+        phone_number: {
+          type: 'string',
+          example: '(123) 456-7890',
+        },
+        favorite_console: {
+          type: 'string',
+          example: 'GameCube',
+        },
+        shopping_cart: {
+          type: 'array',
+          description: 'List of product _ids currently in the customer’s cart',
+          items: {
+            type: 'string',
+          },
+          example: ['6af5eaea63f99c7e6388b82c', '6af5eaea63f99c7e6388b82d'],
         },
       },
     },

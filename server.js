@@ -19,9 +19,10 @@ async function start() {
     const warehouses = db.collection('warehouse');
     const items = db.collection('item');
     const employees = db.collection('employee');
+    const customers = db.collection('customers');
 
     // Pass the collections to createApp
-    const server = createApp(warehouses, items, employees).listen(PORT, () => {
+    const server = createApp(warehouses, items, employees, customers).listen(PORT, () => {
       console.log(`Server running on port ${PORT}`);
     });
 
