@@ -3,6 +3,9 @@ import * as customerController from "../controllers/customer.js"
 
 const router = express.Router()
 
+router.use(express.json())
+router.param("id", customerController.validateCustomerId)
+
 //GetAll
 router.get("/", customerController.getAllCustomerRoute)
 
@@ -11,6 +14,7 @@ router.get("/:id", customerController.getSingleCustomerRoute)
 
 //Create
 router.post("/",
+    customerController.validateCustomer,
     customerController.createSingleCustomerRoute
      /*  #swagger.parameters['body'] = {
             required: true,
@@ -29,7 +33,7 @@ router.post("/",
 )
 
 //Update
-router.put("/:id", customerController.updateSingleCustomerRoute
+router.put("/:id", customerController.validateCustomerUpdate, customerController.updateSingleCustomerRoute
         /*  #swagger.parameters['body'] = {
             required: true,
             in: 'body',
@@ -48,5 +52,23 @@ router.put("/:id", customerController.updateSingleCustomerRoute
 
 //Delete
 router.delete("/:id", customerController.deleteSingleCustomerRoute)
+
+router.use((req, res) => res.status(404).json({ error: "Customer endpoint not found" }))
+
+router.use((error, req, res, next) => {
+    if (res.headersSent) return next(error)
+    if (error.type === "entity.parse.failed") {
+        return res.status(400).json({ error: "Invalid customer request" })
+    }
+    if (error.status === 413) {
+        return res.status(413).json({ error: "Customer request body is too large" })
+    }
+    if (error.status === 415) {
+        return res.status(415).json({ error: "Unsupported request body encoding or charset" })
+    }
+
+    console.error("Customer request failed")
+    res.status(500).json({ error: "Could not process customer request" })
+})
 
 export default router;
