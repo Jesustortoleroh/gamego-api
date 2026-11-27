@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { once } from 'node:events';
-import { test } from 'node:test';
+import { describe, test } from 'node:test'; 
 import express from 'express';
 import { ObjectId } from 'mongodb';
 import itemRoutes from '../routes/items.js';
@@ -53,134 +53,142 @@ function json(method, payload) {
 const item = { name: 'Super Mario Bros.', price: 59.99, inStock: 10 };
 const path = '/items';
 
-test('lists, creates, retrieves, updates, and deletes an item over HTTP', async (t) => {
-  const request = await startApp(t);
-  assert.equal((await request(path)).status, 200);
-  assert.deepEqual(await (await request(path)).json(), []);
+// Wrap all tests in a describe block for better output grouping
+describe('Item API', () => {
 
-  const created = await request(path, json('POST', {
-    ...item,
-    name: ' Super Mario Bros. ',
-  }));
-  assert.equal(created.status, 201);
+  test('lists, creates, retrieves, updates, and deletes an item over HTTP', async (t) => {
+    const request = await startApp(t);
+    assert.equal((await request(path)).status, 200);
+    assert.deepEqual(await (await request(path)).json(), []);
 
-  const { id } = await created.json();
-  assert.match(id, /^[a-f0-9]{24}$/);
-  assert.equal(created.headers.get('location'), `${path}/by-id?id=${id}`);
+    const created = await request(path, json('POST', {
+      ...item,
+      name: ' Super Mario Bros. ',
+    }));
+    assert.equal(created.status, 201);
 
-  const single = await request(created.headers.get('location'));
-  assert.equal(single.status, 200);
-  assert.deepEqual(await single.json(), { ...item, _id: id });
+    const { id } = await created.json();
+    assert.match(id, /^[a-f0-9]{24}$/);
+    assert.equal(created.headers.get('location'), `${path}/by-id?id=${id}`);
 
-  const updated = { name: 'Zelda', price: 49.99, inStock: 4 };
-  for (let attempt = 0; attempt < 2; attempt += 1) {
-    const response = await request(`${path}/${id}`, json('PUT', updated));
-    assert.equal(response.status, 204);
-    assert.equal(await response.text(), '');
-  }
-  assert.deepEqual(await (await request(path)).json(), [{ ...updated, _id: id }]);
+    const single = await request(created.headers.get('location'));
+    assert.equal(single.status, 200);
+    assert.deepEqual(await single.json(), { ...item, _id: id });
 
-  const deleted = await request(`${path}/${id}`, { method: 'DELETE' });
-  assert.equal(deleted.status, 200);
-  assert.deepEqual(await deleted.json(), { message: 'Item deleted' });
+    const updated = { name: 'Zelda', price: 49.99, inStock: 4 };
+    for (let attempt = 0; attempt < 2; attempt += 1) {
+      const response = await request(`${path}/${id}`, json('PUT', updated));
+      assert.equal(response.status, 204);
+      assert.equal(await response.text(), '');
+    }
+    assert.deepEqual(await (await request(path)).json(), [{ ...updated, _id: id }]);
 
-  const missing = await request(created.headers.get('location'));
-  assert.equal(missing.status, 404);
-  assert.deepEqual(await missing.json(), { error: 'Item not found' });
-});
+    const deleted = await request(`${path}/${id}`, { method: 'DELETE' });
+    assert.equal(deleted.status, 200);
+    assert.deepEqual(await deleted.json(), { message: 'Item deleted' });
 
-test('returns 400 for invalid and missing item IDs', async (t) => {
-  const request = await startApp(t);
-  const cases = [
-    [`${path}/by-id`],
-    [`${path}/by-id?id=invalid`],
-    [`${path}/by-id?id=${new ObjectId()}&id=${new ObjectId()}`],
-    [`${path}/invalid`, json('PUT', item)],
-    [`${path}/invalid`, { method: 'DELETE' }],
-  ];
+    const missing = await request(created.headers.get('location'));
+    assert.equal(missing.status, 404);
+    assert.deepEqual(await missing.json(), { error: 'Item not found' });
+  });
 
-  for (const [url, options] of cases) {
-    const response = await request(url, options);
-    assert.equal(response.status, 400);
-    assert.deepEqual(await response.json(), {
-      error: 'A valid item ID is required',
+  test('returns 400 for invalid and missing item IDs', async (t) => {
+    const request = await startApp(t);
+    const cases = [
+      [`${path}/by-id`],
+      [`${path}/by-id?id=invalid`],
+      [`${path}/by-id?id=${new ObjectId()}&id=${new ObjectId()}`],
+      [`${path}/invalid`, json('PUT', item)],
+      [`${path}/invalid`, { method: 'DELETE' }],
+    ];
+
+    for (const [url, options] of cases) {
+      const response = await request(url, options);
+      assert.equal(response.status, 400);
+      assert.deepEqual(await response.json(), {
+        error: 'A valid item ID is required',
+      });
+    }
+  });
+
+  test('returns field errors for invalid POST and PUT bodies', async (t) => {
+    const request = await startApp(t);
+    const created = await request(path, json('POST', item));
+    const { id } = await created.json();
+    const invalid = { name: ' ', price: -1, inStock: -2 };
+
+    for (const [url, method] of [[path, 'POST'], [`${path}/${id}`, 'PUT']]) {
+      const response = await request(url, json(method, invalid));
+      assert.equal(response.status, 400);
+      const { error, fields } = await response.json();
+      assert.equal(error, 'Invalid item data');
+      assert.deepEqual(Object.keys(fields), ['name', 'price', 'inStock']);
+    }
+
+    const empty = await request(path, { method: 'POST' });
+    assert.equal(empty.status, 400);
+    assert.deepEqual(await (await request(path)).json(), [{ ...item, _id: id }]);
+  });
+
+  test('returns JSON errors for malformed, oversized, and unsupported bodies', async (t) => {
+    const request = await startApp(t);
+
+    const malformed = await request(path, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: '{"name":',
     });
-  }
-});
+    assert.equal(malformed.status, 400);
+    assert.deepEqual(await malformed.json(), { error: 'Invalid item request' });
 
-test('returns field errors for invalid POST and PUT bodies', async (t) => {
-  const request = await startApp(t);
-  const created = await request(path, json('POST', item));
-  const { id } = await created.json();
-  const invalid = { name: ' ', price: -1, inStock: -2 };
+    const oversized = await request(path, json('POST', {
+      ...item,
+      name: 'x'.repeat(110_000),
+    }));
+    assert.equal(oversized.status, 413);
+    assert.deepEqual(await oversized.json(), {
+      error: 'Item request body is too large',
+    });
 
-  for (const [url, method] of [[path, 'POST'], [`${path}/${id}`, 'PUT']]) {
-    const response = await request(url, json(method, invalid));
-    assert.equal(response.status, 400);
-    const { error, fields } = await response.json();
-    assert.equal(error, 'Invalid item data');
-    assert.deepEqual(Object.keys(fields), ['name', 'price', 'inStock']);
-  }
-
-  const empty = await request(path, { method: 'POST' });
-  assert.equal(empty.status, 400);
-  assert.deepEqual(await (await request(path)).json(), [{ ...item, _id: id }]);
-});
-
-test('returns JSON errors for malformed, oversized, and unsupported bodies', async (t) => {
-  const request = await startApp(t);
-
-  const malformed = await request(path, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: '{"name":',
-  });
-  assert.equal(malformed.status, 400);
-  assert.deepEqual(await malformed.json(), { error: 'Invalid item request' });
-
-  const oversized = await request(path, json('POST', {
-    ...item,
-    name: 'x'.repeat(110_000),
-  }));
-  assert.equal(oversized.status, 413);
-  assert.deepEqual(await oversized.json(), {
-    error: 'Item request body is too large',
+    const unsupported = await request(path, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json; charset=iso-8859-1' },
+      body: JSON.stringify(item),
+    });
+    assert.equal(unsupported.status, 415);
+    assert.deepEqual(await unsupported.json(), {
+      error: 'Unsupported request body encoding or charset',
+    });
   });
 
-  const unsupported = await request(path, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json; charset=iso-8859-1' },
-    body: JSON.stringify(item),
-  });
-  assert.equal(unsupported.status, 415);
-  assert.deepEqual(await unsupported.json(), {
-    error: 'Unsupported request body encoding or charset',
-  });
-});
+  test('returns 404 when a valid ID is missing during update or delete', async (t) => {
+    const request = await startApp(t);
+    const url = `${path}/${new ObjectId()}`;
 
-test('returns 404 when a valid ID is missing during update or delete', async (t) => {
-  const request = await startApp(t);
-  const url = `${path}/${new ObjectId()}`;
-
-  for (const options of [json('PUT', item), { method: 'DELETE' }]) {
-    const response = await request(url, options);
-    assert.equal(response.status, 404);
-    assert.deepEqual(await response.json(), { error: 'Item not found' });
-  }
-});
-
-test('returns a generic JSON 500 for unexpected database failures', async (t) => {
-  const request = await startApp(t, {
-    find: () => ({
-      toArray: async () => {
-        throw new Error('Internal database details');
-      },
-    }),
+    for (const options of [json('PUT', item), { method: 'DELETE' }]) {
+      const response = await request(url, options);
+      assert.equal(response.status, 404);
+      assert.deepEqual(await response.json(), { error: 'Item not found' });
+    }
   });
 
-  const response = await request(path);
-  assert.equal(response.status, 500);
-  assert.deepEqual(await response.json(), {
-    error: 'Could not process item request',
+  test('returns a generic JSON 500 for unexpected database failures', async (t) => {
+    // Suppress expected error logs from stdout
+    t.mock.method(console, 'error', () => {}); 
+    
+    const request = await startApp(t, {
+      find: () => ({
+        toArray: async () => {
+          throw new Error('Internal database details');
+        },
+      }),
+    });
+
+    const response = await request(path);
+    assert.equal(response.status, 500);
+    assert.deepEqual(await response.json(), {
+      error: 'Could not process item request',
+    });
   });
+
 });
